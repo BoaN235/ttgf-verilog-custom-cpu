@@ -102,7 +102,6 @@
     "gf180mcu_fd_sc_mcu7t5v0__.*"
   ],
   "MAGIC_DRC_MAGLEFS": [
-    "dir::macros/maglef/gf180mcu_fd_ip_sram__sram128x8m8wm1.mag",
     "dir::macros/maglef/gf180mcu_fd_ip_sram__sram64x8m8wm1.mag"
   ],
   "MAGIC_EXT_USE_GDS": false,
