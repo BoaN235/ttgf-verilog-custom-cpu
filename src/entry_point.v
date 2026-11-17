@@ -36,17 +36,19 @@ module tt_um_cpu (
     assign uio_oe  = 8'h00;
 
     wire program_write_enable;
-    wire [7:0] program_data_address;
+    wire [6:0] program_data_address;
 
     wire data_write_enable;
-    wire [6:0] data_address;
+    wire [5:0] data_address;
+
+    wire executing
 
     // Output multiplexer: select which SRAM based on ui_in[7]
     assign uo_out  = ui_in[7] ? data_out : program_data_out;
 
     reg restart_program = 1'b0;
 
-    program_block programs (.clk(clk), .reset(rst_n), .restart_program(restart_program), .read_enable(program_write_enable), .program_data_address(program_data_address));
+    program_block programs (.clk(clk), .reset(rst_n), .restart_program(restart_program), .executing(executing_cmd) .read_enable(program_write_enable), .program_data_address(program_data_address));
 
 `ifdef SYNTH
     // Tiny Tapeout's FPGA workflow defines SYNTH. Use inferred memories
