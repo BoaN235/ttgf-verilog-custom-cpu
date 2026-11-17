@@ -1,7 +1,7 @@
 # Tiny Tapeout GF180MCU SRAM starter project information
 project:
   title:        "Tiny Tapeout GF180 SRAM (Verilog)"
-  author:       "opilitethesmartdev"
+  author:       "Noah"
   discord:      ""
   description:  "Verilog starter project using the official Google GF180MCU 64x8 SRAM macro"
   language:     "Verilog"
@@ -14,7 +14,7 @@ project:
 
   source_files:
     - "entry_point.v"
-    - "program/program_block.v"
+    - "blocks/program/program_block.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
