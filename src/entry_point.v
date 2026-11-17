@@ -42,7 +42,7 @@ module tt_um_cpu (
     wire [6:0] data_address;
 
     // Output multiplexer: select which SRAM based on ui_in[7]
-    assign uo_out  = ui_in[7] ? sram2_q : sram1_q;
+    assign uo_out  = ui_in[7] ? data_out : program_data_out;
 
     reg restart_program = 1'b0;
 
