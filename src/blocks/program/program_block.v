@@ -3,7 +3,7 @@ module program_block(
     input wire reset,
     input wire restart_program,
 
-    input wire executing;
+    input wire executing,
 
     output reg write_enable,
     output reg [6:0] program_data_address
@@ -16,7 +16,7 @@ module program_block(
             if (reset) begin // If reset pin is high restart download
                 program_data_address <= 7'd0;
                 write_enable <= 1'b0;
-                program_start <= 1'b0
+                program_start <= 1'b0;
             end 
             
             else if (write_enable)
