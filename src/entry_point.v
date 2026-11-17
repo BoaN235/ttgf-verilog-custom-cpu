@@ -43,11 +43,6 @@ module tt_um_cpu (
 
     wire executing_cmd;
 
-
-    assign data_write_enable = 1'b0;
-    assign data_address = 6'd0;
-    assign executing_cmd = 1'b0;
-
     wire unused = &{1'b0, ui_in[6:0]};
 
     // Output multiplexer: select which SRAM based on ui_in[7]
@@ -55,7 +50,7 @@ module tt_um_cpu (
 
     reg restart_program = 1'b0;
 
-    // command_block command (.clk(clk), reset(~rst_n), )
+    command_block command (.clk(clk), reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .write_enable(data_write_enable), .data_address(data_address));
     program_block programs (.clk(clk), .reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .write_enable(program_write_enable), .program_data_address(program_data_address));
 
 `ifdef SYNTH
