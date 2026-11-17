@@ -16,12 +16,16 @@ from pathlib import Path
 import gdstk
 
 
-GDS_PATH = Path(
-    "src/gf180mcu_fd_ip_sram/cells/"
-    "gf180mcu_fd_ip_sram__sram64x8m8wm1/"
-    "gf180mcu_fd_ip_sram__sram64x8m8wm1.gds"
-)
-ROOT_CELL = "gf180mcu_fd_ip_sram__sram64x8m8wm1"
+SRAM_CONFIGS = [
+    {
+        "gds_path": "src/gf180mcu_fd_ip_sram/cells/gf180mcu_fd_ip_sram__sram128x8m8wm1/gf180mcu_fd_ip_sram__sram128x8m8wm1.gds",
+        "root_cell": "gf180mcu_fd_ip_sram__sram128x8m8wm1",
+    },
+    {
+        "gds_path": "src/gf180mcu_fd_ip_sram/cells/gf180mcu_fd_ip_sram__sram64x8m8wm1/gf180mcu_fd_ip_sram__sram64x8m8wm1.gds",
+        "root_cell": "gf180mcu_fd_ip_sram__sram64x8m8wm1",
+    },
+]
 UNSUPPORTED_LAYER = 58
 CELL_PREFIX = "GF180S_"
 
@@ -67,7 +71,7 @@ def inspect_gds(path: Path) -> tuple[list[str], dict[str, set[str]], int]:
     return cells, references, layer_58_records
 
 
-def validate_gds(path: Path) -> None:
+def validate_gds(path: Path, root_cell: str) -> None:
     cells, references, layer_58_records = inspect_gds(path)
     known = set(cells)
     missing = sorted(
@@ -81,9 +85,9 @@ def validate_gds(path: Path) -> None:
 
     if missing:
         raise SystemExit(f"{path}: missing hierarchy cells: {missing[:10]}")
-    if top_cells != [ROOT_CELL]:
+    if top_cells != [root_cell]:
         raise SystemExit(
-            f"{path}: expected only top cell {ROOT_CELL!r}; found {top_cells}"
+            f"{path}: expected only top cell {root_cell!r}; found {top_cells}"
         )
     if layer_58_records:
         raise SystemExit(
@@ -91,19 +95,20 @@ def validate_gds(path: Path) -> None:
         )
 
 
-def main() -> None:
-    if not GDS_PATH.is_file():
-        raise SystemExit(f"Official SRAM GDS not found: {GDS_PATH}")
+def normalize_sram_gds(gds_path: str, root_cell: str) -> None:
+    gds_path_obj = Path(gds_path)
+    if not gds_path_obj.is_file():
+        raise SystemExit(f"Official SRAM GDS not found: {gds_path_obj}")
 
-    original_cells, original_refs, original_layer_58 = inspect_gds(GDS_PATH)
-    if ROOT_CELL not in original_cells:
-        raise SystemExit(f"{GDS_PATH}: missing expected root cell {ROOT_CELL!r}")
+    original_cells, original_refs, original_layer_58 = inspect_gds(gds_path_obj)
+    if root_cell not in original_cells:
+        raise SystemExit(f"{gds_path_obj}: missing expected root cell {root_cell!r}")
 
-    library = gdstk.read_gds(str(GDS_PATH))
-    roots = [cell for cell in library.cells if cell.name == ROOT_CELL]
+    library = gdstk.read_gds(str(gds_path_obj))
+    roots = [cell for cell in library.cells if cell.name == root_cell]
     if len(roots) != 1:
         raise SystemExit(
-            f"{GDS_PATH}: expected one root cell {ROOT_CELL!r}; found {len(roots)}"
+            f"{gds_path_obj}: expected one root cell {root_cell!r}; found {len(roots)}"
         )
 
     root = roots[0]
@@ -139,31 +144,37 @@ def main() -> None:
         if to_remove:
             cell.remove(*to_remove)
 
-    temporary = GDS_PATH.with_suffix(".normalized.gds")
+    temporary = gds_path_obj.with_suffix(".normalized.gds")
     library.write_gds(str(temporary))
 
     # Validate the actual serialized output, not just the in-memory library.
-    validate_gds(temporary)
+    validate_gds(temporary, root_cell)
     output_cells, output_refs, output_layer_58 = inspect_gds(temporary)
     if len(output_cells) != len(original_cells):
         temporary.unlink(missing_ok=True)
         raise SystemExit(
-            f"{GDS_PATH}: cell count changed from {len(original_cells)} "
+            f"{gds_path_obj}: cell count changed from {len(original_cells)} "
             f"to {len(output_cells)}"
         )
     if sum(map(len, output_refs.values())) != sum(map(len, original_refs.values())):
         temporary.unlink(missing_ok=True)
-        raise SystemExit(f"{GDS_PATH}: hierarchy reference count changed")
-    temporary.replace(GDS_PATH)
+        raise SystemExit(f"{gds_path_obj}: hierarchy reference count changed")
+    temporary.replace(gds_path_obj)
 
-    print(f"Normalized official SRAM GDS: {GDS_PATH}")
-    print(f"  Root cell preserved: {ROOT_CELL}")
+    print(f"Normalized official SRAM GDS: {gds_path_obj}")
+    print(f"  Root cell preserved: {root_cell}")
     print(f"  Internal cells renamed: {len(internal_cells)}")
     print(f"  Layer 58 records removed from source: {original_layer_58}")
     print(f"  Gdstk elements removed: {removed}")
     print(f"  Serialized layer 58 records remaining: {output_layer_58}")
-    print(f"  Unique top cell verified: {ROOT_CELL}")
+    print(f"  Unique top cell verified: {root_cell}")
+
+
+def main() -> None:
+    for config in SRAM_CONFIGS:
+        normalize_sram_gds(config["gds_path"], config["root_cell"])
 
 
 if __name__ == "__main__":
     main()
+
