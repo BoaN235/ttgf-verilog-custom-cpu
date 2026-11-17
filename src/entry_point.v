@@ -55,6 +55,7 @@ module tt_um_cpu (
 
     reg restart_program = 1'b0;
 
+    // command_block command (.clk(clk), reset(~rst_n), )
     program_block programs (.clk(clk), .reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .write_enable(program_write_enable), .program_data_address(program_data_address));
 
 `ifdef SYNTH
