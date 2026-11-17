@@ -93,7 +93,7 @@ module tt_um_cpu (
     wire VPWR;
     wire VGND;
 
-    gf180mcu_fd_ip_sram__sram128x8m8wm1 program_data (
+    gf180mcu_fd_ip_sram__sram128x8m8wm1 sram1 (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
@@ -124,7 +124,7 @@ module tt_um_cpu (
     wire model_vdd = 1'b1;
     wire model_vss = 1'b0;
 
-    gf180mcu_fd_ip_sram__sram128x8m8wm1 program_data (
+    gf180mcu_fd_ip_sram__sram128x8m8wm1 sram1 (
         .CLK  (clk),
         .CEN  (~(ena & rst_n)),
         .GWEN (~program_write_enable),
