@@ -29,16 +29,24 @@ module tt_um_cpu (
     input  wire       rst_n
 );
 
-    wire [7:0] sram1_q;  // Program memory output
-    wire [7:0] sram2_q;  // Data memory output
+    wire [7:0] program_data_out;  // Program memory output
+    wire [7:0] data_out;  // Data memory output
 
     assign uio_out = 8'h00;
     assign uio_oe  = 8'h00;
+
+    wire program_write_enable;
+    wire [7:0] program_data_address;
+
+    wire data_write_enable;
+    wire [6:0] data_address;
+
     // Output multiplexer: select which SRAM based on ui_in[7]
     assign uo_out  = ui_in[7] ? sram2_q : sram1_q;
 
+    reg restart_program = 1'b0;
 
-//program_block programs (clk, rst_n, );
+    program_block programs (.clk(clk), .reset(rst_n), .restart_program(restart_program), .read_enable(program_write_enable), .program_data_address(program_data_address));
 
 `ifdef SYNTH
     // Tiny Tapeout's FPGA workflow defines SYNTH. Use inferred memories
@@ -53,16 +61,16 @@ module tt_um_cpu (
             fpga_q2 <= 8'h00;
         end else if (ena) begin
             // Program memory
-            if (ui_in[6]) begin
-                fpga_program[ui_in[6:0]] <= uio_in;
+            if (program_write_enable) begin
+                fpga_program[program_data_address] <= uio_in;
             end else begin
-                fpga_q1 <= fpga_program[ui_in[6:0]];
+                fpga_q1 <= fpga_program[program_data_address];
             end
             // Data memory
-            if (ui_in[6]) begin
-                fpga_data[ui_in[5:0]] <= uio_in;
+            if (data_write_enable) begin
+                fpga_data[data_address] <= uio_in;
             end else begin
-                fpga_q2 <= fpga_data[ui_in[5:0]];
+                fpga_q2 <= fpga_data[data_address];
             end
         end
     end
@@ -76,14 +84,14 @@ module tt_um_cpu (
     wire VPWR;
     wire VGND;
 
-    gf180mcu_fd_ip_sram__sram128x8m8wm1 sram1 (
+    gf180mcu_fd_ip_sram__sram128x8m8wm1 program_data (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
         .CEN  (~(ena & rst_n)),
-        .GWEN (~ui_in[6]),
+        .GWEN (~program_write_enable),
         .WEN  (8'h00),
-        .A    (ui_in[6:0]),
+        .A    (program_data_address),
         .D    (uio_in),
         .Q    (sram1_q)
     );
@@ -93,9 +101,9 @@ module tt_um_cpu (
         .VSS  (VGND),
         .CLK  (clk),
         .CEN  (~(ena & rst_n)),
-        .GWEN (~ui_in[6]),
+        .GWEN (~data_write_enable),
         .WEN  (8'h00),
-        .A    (ui_in[5:0]),
+        .A    (data_address),
         .D    (uio_in),
         .Q    (sram2_q)
     );
@@ -107,12 +115,12 @@ module tt_um_cpu (
     wire model_vdd = 1'b1;
     wire model_vss = 1'b0;
 
-    gf180mcu_fd_ip_sram__sram128x8m8wm1 sram1 (
+    gf180mcu_fd_ip_sram__sram128x8m8wm1 program_data (
         .CLK  (clk),
         .CEN  (~(ena & rst_n)),
-        .GWEN (~ui_in[6]),
+        .GWEN (~program_write_enable),
         .WEN  (8'h00),
-        .A    (ui_in[6:0]),
+        .A    (program_data_address),
         .D    (uio_in),
         .Q    (sram1_q),
         .VDD  (model_vdd),
@@ -122,9 +130,9 @@ module tt_um_cpu (
     gf180mcu_fd_ip_sram__sram64x8m8wm1 sram2 (
         .CLK  (clk),
         .CEN  (~(ena & rst_n)),
-        .GWEN (~ui_in[6]),
+        .GWEN (~data_write_enable),
         .WEN  (8'h00),
-        .A    (ui_in[5:0]),
+        .A    (data_address),
         .D    (uio_in),
         .Q    (sram2_q),
         .VDD  (model_vdd),
