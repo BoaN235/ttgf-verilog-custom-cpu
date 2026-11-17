@@ -75,8 +75,8 @@ module tt_um_cpu (
         end
     end
 
-    assign sram1_q = fpga_q1;
-    assign sram2_q = fpga_q2;
+    assign program_data_out = fpga_q1;
+    assign data_out = fpga_q2;
 
 `elsif __pnr__
     // LibreLane defines __pnr__ and supplies the black-box header through
