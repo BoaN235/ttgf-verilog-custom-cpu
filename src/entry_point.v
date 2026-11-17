@@ -93,7 +93,7 @@ module tt_um_cpu (
         .WEN  (8'h00),
         .A    (program_data_address),
         .D    (uio_in),
-        .Q    (sram1_q)
+        .Q    (program_data_out)
     );
 
     gf180mcu_fd_ip_sram__sram64x8m8wm1 sram2 (
@@ -105,7 +105,7 @@ module tt_um_cpu (
         .WEN  (8'h00),
         .A    (data_address),
         .D    (uio_in),
-        .Q    (sram2_q)
+        .Q    (data_out)
     );
 
 `else
@@ -122,7 +122,7 @@ module tt_um_cpu (
         .WEN  (8'h00),
         .A    (program_data_address),
         .D    (uio_in),
-        .Q    (sram1_q),
+        .Q    (program_data_out),
         .VDD  (model_vdd),
         .VSS  (model_vss)
     );
@@ -134,7 +134,7 @@ module tt_um_cpu (
         .WEN  (8'h00),
         .A    (data_address),
         .D    (uio_in),
-        .Q    (sram2_q),
+        .Q    (data_out),
         .VDD  (model_vdd),
         .VSS  (model_vss)
     );
