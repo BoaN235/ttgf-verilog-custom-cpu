@@ -64,8 +64,6 @@ jobs:
           load $CELL
           save $OUT
           quit -noprompt
-EOF
-
             test -s "$OUT"
             grep -q '^magic$' "$OUT"
             grep -q '<< end >>' "$OUT"
