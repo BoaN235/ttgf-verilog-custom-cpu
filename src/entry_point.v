@@ -41,17 +41,35 @@ module tt_um_cpu (
     wire data_write_enable;
     wire [5:0] data_address;
 
-    wire executing_cmd;
+    wire [3:0] executing_cmd;
+    wire [6:0] cmd_address;
+    wire restart_program;
 
     wire unused = &{1'b0, ui_in[6:0]};
 
     // Output multiplexer: select which SRAM based on ui_in[7]
-    assign uo_out  = ui_in[7] ? data_out : program_data_out;
+    assign uo_out = ui_in[7] ? data_out : program_data_out;
 
-    reg restart_program = 1'b0;
+    command_block command (
+        .clk(clk),
+        .reset(~rst_n),
+        .instruction(program_data_out),
+        .restart_program(restart_program),
+        .executing(executing_cmd),
+        .write_enable(data_write_enable),
+        .data_address(data_address),
+        .cmd_address(cmd_address)
+    );
 
-    command_block command (.clk(clk), reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .cmd_address(cmd_address), .write_enable(data_write_enable), .data_address(data_address));
-    program_block programs (.clk(clk), .reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .write_enable(program_write_enable), .program_data_address(program_data_address), .cmd_address(cmd_address));
+    program_block programs (
+        .clk(clk),
+        .reset(~rst_n),
+        .restart_program(restart_program),
+        .executing(executing_cmd),
+        .write_enable(program_write_enable),
+        .program_data_address(program_data_address),
+        .cmd_address(cmd_address)
+    );
 
 `ifdef SYNTH
     // Tiny Tapeout's FPGA workflow defines SYNTH. Use inferred memories
