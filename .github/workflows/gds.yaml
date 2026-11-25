@@ -34,39 +34,43 @@ jobs:
           make -j2
           sudo make install
 
-      - name: Generate SRAM Magic abstract view
+      - name: Generate SRAM Magic abstract views
         env:
           PDK_ROOT: /home/runner/.ciel
           PDK_VERSION: 54435919abffb937387ec956209f9cf5fd2dfbee
         run: |
           set -euo pipefail
-          CELL=gf180mcu_fd_ip_sram__sram64x8m8wm1
           PDK_DIR="$PDK_ROOT/ciel/gf180mcu/versions/$PDK_VERSION/gf180mcuD"
           MAGICRC="$PDK_DIR/libs.tech/magic/gf180mcuD.magicrc"
-          LEF="src/gf180mcu_fd_ip_sram/cells/$CELL/$CELL.lef"
-          OUT="src/macros/maglef/$CELL.mag"
 
           test -f "$MAGICRC"
-          test -f "$LEF"
-          mkdir -p "$(dirname "$OUT")"
+          mkdir -p src/macros/maglef
 
-          # Import the vendor LEF into Magic's abstract-view database. This
-          # creates the cell view used by MAGIC_DRC_MAGLEFS; it does not alter
-          # the vendor GDS that is streamed into the final design.
-          export MAGTYPE=maglef
-          magic -dnull -noconsole -rcfile "$MAGICRC" <<EOF
+          for CELL in \
+            gf180mcu_fd_ip_sram__sram64x8m8wm1 \
+            gf180mcu_fd_ip_sram__sram128x8m8wm1
+          do
+            LEF="src/gf180mcu_fd_ip_sram/cells/$CELL/$CELL.lef"
+            OUT="src/macros/maglef/$CELL.mag"
+
+            test -f "$LEF"
+
+            # Import the vendor LEF into an abstract Magic database view.
+            # This view is used by DRC; it does not replace the vendor GDS.
+            export MAGTYPE=maglef
+            magic -dnull -noconsole -rcfile "$MAGICRC" <<EOF
           drc off
           lef read $LEF
           load $CELL
           save $OUT
           quit -noprompt
-          EOF
+EOF
 
-          test -s "$OUT"
-          grep -q '^magic$' "$OUT"
-          grep -q '<< end >>' "$OUT"
-          echo "Generated $OUT"
-          sed -n '1,24p' "$OUT"
+            test -s "$OUT"
+            grep -q '^magic$' "$OUT"
+            grep -q '<< end >>' "$OUT"
+            echo "Generated $OUT"
+          done
 
       - name: Install GDS editing dependency
         run: python3 -m pip install gdstk --break-system-packages
