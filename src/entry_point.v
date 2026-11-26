@@ -99,7 +99,7 @@ module tt_um_cpu (
 
 
         .write_enable(program_write_enable),
-        .program_data_address(target_program_data_address)
+        .program_data_address(target_program_data_address),
         .new_program_address(new_program_address)
 
     );
