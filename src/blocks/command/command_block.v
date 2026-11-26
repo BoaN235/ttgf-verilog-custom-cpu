@@ -1,10 +1,10 @@
 module command_block (
     input wire clk,
     input wire reset,
-    input [7:0] program_ram_data,
+    input wire [7:0] program_ram_data,
 
     output reg restart_program,
-    output reg executing,
+    output reg [3:0] executing,
 
     output reg write_enable,
     output reg [5:0] data_address,
