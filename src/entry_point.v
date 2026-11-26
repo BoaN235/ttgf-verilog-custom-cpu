@@ -55,7 +55,7 @@ module tt_um_cpu (
     command_block command (
         .clk(clk),
         .reset(~rst_n),
-        .program_ram_data(program_data_out)
+        .program_ram_data(program_data_out),
         .restart_program(restart_program),
         .executing(executing_cmd),
         .cmd_address(cmd_address),
