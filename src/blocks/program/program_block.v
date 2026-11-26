@@ -2,7 +2,7 @@ module program_block (
     input wire clk,
     input wire reset,
     input wire restart_program,
-    input wire executing,
+    input wire [3:0] executing,
     input wire [6:0] cmd_address,
 
     output reg write_enable,
@@ -24,11 +24,11 @@ module program_block (
             end
         end
 
-        else if (executing == 1'b0000) begin
+        else if (executing == 4'b0000) begin
             if (restart_program) begin
                 program_data_address <= 7'd0;
             end 
-            else if (executing == 1'b1100 or executing == 1'b1101 or executing == 1'b1110) begin
+            else if (executing == 4'b1100 or executing == 4'b1101 or executing == 4'b1110) begin
                 if (cmd_address != 1'b0000000) begin
                 program_data_address <= cmd_address;
                 end
@@ -37,7 +37,7 @@ module program_block (
                 program_data_address <= 7'd0;
             end
             else begin
-                program_data_address <= program_data_address + 1'b11;
+                program_data_address <= program_data_address + 2'b11;
             end
         end
     end
