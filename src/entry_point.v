@@ -82,7 +82,7 @@ module tt_um_cpu (
         .write_enable(data_write_enable),
         .data_address(data_address),
 
-        .result(result)
+        .result(result),
         .command_done(command_done)
 
     );
