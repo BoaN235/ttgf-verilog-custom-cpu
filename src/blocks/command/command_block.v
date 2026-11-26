@@ -1,3 +1,4 @@
+
 module command_block (
     input wire clk,
     input wire reset,
@@ -17,412 +18,344 @@ module command_block (
 
     reg [3:0] selector;
     reg [1:0] command_length;
-    reg [3:0] counter;
-    
+    reg [1:0] counter;
+
+    // Temporary placeholder until jump functionality is implemented.
+    assign jump_bool = 1'b0;
 
     always @(posedge clk) begin
-        if (!hold_command) begin // I split it up so its easier to read and understand each cmd
-            case (command_mem [3:0])  // -> = return value to working memory when cmd ends
-                
-                4'b0000:   selector = 0; // 0000 End x
-                
-                                    // [ DATA TRANSFER  saving or reading data ]
-                
-                4'b0001: begin  // 0001 Read (output Num at address) Done 
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+        if (reset) begin
+            selector         <= 4'd0;
+            command_length   <= 2'd0;
+            counter          <= 2'd0;
+            write_enable     <= 1'b0;
+            data_address     <= 6'd0;
+            cmd_address      <= 7'd0;
+            restart_program  <= 1'b0;
+            hold_program     <= 1'b0;
+            result           <= 8'd0;
+        end
+        else if (!hold_command) begin
+            // Each command is selected using the lowest 4 bits.
+            case (command_mem[3:0])
 
-                            selector = 4'd1; 
-                            write_enable = 1'b0; 
+                4'b0000: begin // End
+                    selector = 4'd0;
+                end
+
+                // DATA TRANSFER
+
+                4'b0001: begin // Read
+
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd1;
+                            write_enable = 1'b0;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                4'b0010: begin // 0010 Save (Save -> at address) Done
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b0010: begin // Save
 
-                            selector = 4'd2; 
-                            write_enable = 1'b1; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd2;
+                            write_enable = 1'b1;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
-                    endcase
-                end
-                
-                4'b0011: begin // 0011 Write (Save Num x at address) Done  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
-
-                            selector = 4'd3; 
-                            write_enable = 1'b1; 
-                            counter <= 2'b01;
-
-                        end
-                        2'b01: begin 
-
-                            counter <= 2'b10;
-
-                        end
-                        2'b10: begin 
-
-                            counter <= 2'b11;
-
-                        end
-                        2'b11: begin 
-
-                            counter <= 2'b00;
-
-                        end
-                        default: begin
-
-                            selector = 4'd15;
-                            hold_program = 1'b0;
-
-                        end
-
                     endcase
                 end
 
-                4'b0100: begin // 0100 Copy (Copy value @ address x to address y) x  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b0011: begin // Write
 
-                            selector = 4'd4; 
-                            write_enable = 1'b1; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd3;
+                            write_enable = 1'b1;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
-                    endcase
-                end
-                
-                                    // [ ALU - Math & Logic ]
-                
-                4'b0101: begin  // 0101 Math (See Math Instructions) x
-    
-                    case(counter)
-                    
-                        2'b00: begin 
-
-                            selector = 4'd5; 
-                            counter <= 2'b01;
-
-                        end
-                        2'b01: begin 
-
-                            counter <= 2'b10;
-
-                        end
-                        2'b10: begin 
-
-                            counter <= 2'b11;
-
-                        end
-                        2'b11: begin 
-
-                            counter <= 2'b00;
-
-                        end
-                        default: begin
-
-                            selector = 4'd15;
-                            hold_program = 1'b0;
-
-                        end
-
                     endcase
                 end
 
-                4'b0110: begin   // 1001 Logic (See Logic Instruction) x
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b0100: begin // Copy
 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd4;
+                            write_enable = 1'b1;
+                            counter <= 2'b01;
+                        end
+
+                        2'b01: begin
+                            counter <= 2'b10;
+                        end
+
+                        2'b10: begin
+                            counter <= 2'b11;
+                        end
+
+                        2'b11: begin
+                            counter <= 2'b00;
+                        end
+
+                        default: begin
+                            selector = 4'd15;
+                            hold_program = 1'b0;
+                        end
+                    endcase
+                end
+
+                // ALU - MATH AND LOGIC
+
+                4'b0101: begin // Math
+
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd5;
+                            counter <= 2'b01;
+                        end
+
+                        2'b01: begin
+                            counter <= 2'b10;
+                        end
+
+                        2'b10: begin
+                            counter <= 2'b11;
+                        end
+
+                        2'b11: begin
+                            counter <= 2'b00;
+                        end
+
+                        default: begin
+                            selector = 4'd15;
+                            hold_program = 1'b0;
+                        end
+                    endcase
+                end
+
+                4'b0110: begin // Logic
+
+                    case (counter)
+                        2'b00: begin
                             selector = 4'd6;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                4'b0111: begin // 1100 Shift R/L (See Shift Instructions) x  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b0111: begin // Shift R/L
 
-                            selector = 4'd7; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd7;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                                    // [ Control FLow - Functions & Conditionals ]
+                // CONTROL FLOW - FUNCTIONS AND CONDITIONALS
 
-                4'b1000: begin  // 1100 If () x  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b1000: begin // If
 
-                            selector = 4'd8; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd8;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                4'b1001: begin  // 1100 Return () x  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b1001: begin // Return
 
-                            selector = 4'd9; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd9;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                4'b1010: begin  // 1100 Jump () x  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b1010: begin // Jump
 
-                            selector = 4'd10; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd10;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                4'b1011: begin  // 1100 Wait () x  
-    
-                    case(counter)
-                    
-                        2'b00: begin 
+                4'b1011: begin // Wait
 
-                            selector = 4'd11; 
+                    case (counter)
+                        2'b00: begin
+                            selector = 4'd11;
                             counter <= 2'b01;
-
                         end
-                        2'b01: begin 
 
+                        2'b01: begin
                             counter <= 2'b10;
-
                         end
-                        2'b10: begin 
 
+                        2'b10: begin
                             counter <= 2'b11;
-
                         end
-                        2'b11: begin 
 
+                        2'b11: begin
                             counter <= 2'b00;
-
                         end
-                        default: begin
 
+                        default: begin
                             selector = 4'd15;
                             hold_program = 1'b0;
-
                         end
-
                     endcase
                 end
 
-                default: selector = 15;  // 0000 End
+                default: begin
+                    selector = 4'd15;
+                end
+
             endcase
         end
     end
+
 endmodule
