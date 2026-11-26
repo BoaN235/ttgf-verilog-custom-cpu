@@ -92,7 +92,7 @@ module tt_um_cpu (
         .reset(~rst_n),
         .restart_program(restart_program),
         
-        .executing(hold_program),
+        .hold_program(hold_program),
         .cmd_address(cmd_address),
         .jump_bool(jump_bool),
 
