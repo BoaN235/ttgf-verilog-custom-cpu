@@ -11,7 +11,8 @@ module command_block (
     output reg [5:0] data_address,
     output reg [6:0] cmd_address,
     output reg restart_program,
-    output reg [7:0] result
+    output reg [7:0] result,
+    output reg command_done
 );
 
     reg [3:0] selector;
@@ -65,7 +66,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -93,7 +94,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -121,7 +122,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -149,7 +150,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -178,7 +179,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -205,7 +206,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -232,7 +233,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -261,7 +262,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -288,7 +289,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -315,7 +316,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end
@@ -342,7 +343,7 @@ module command_block (
 
                         default: begin
                             selector <= 4'd15;
-                            hold_program <= 1'b0;
+                            command_done <= 1'b0;
                         end
                     endcase
                 end

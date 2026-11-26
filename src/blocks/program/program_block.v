@@ -8,7 +8,8 @@ module program_block (
     input wire [6:0] cmd_address,
 
     output reg write_enable,
-    output reg [6:0] program_data_address
+    output reg [6:0] program_data_address,
+    output reg new_program_address
 );
 
     always @(posedge clk) begin
@@ -38,6 +39,9 @@ module program_block (
             else begin
                 program_data_address <= program_data_address + 7'b11;
             end
+            new_program_address <= 1'b1
+        end else begin
+            new_program_address <= 1'b0
         end
     end
 

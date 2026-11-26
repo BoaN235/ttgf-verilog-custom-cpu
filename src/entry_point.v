@@ -61,6 +61,7 @@ module tt_um_cpu (
     reg hold_program;
     reg hold_command;
     wire restart_program;
+    wire command_done;
 
     assign uio_out = result;
 
@@ -82,6 +83,7 @@ module tt_um_cpu (
         .data_address(data_address),
 
         .result(result)
+        .command_done(command_done)
 
     );
 
@@ -98,51 +100,56 @@ module tt_um_cpu (
 
         .write_enable(program_write_enable),
         .program_data_address(target_program_data_address)
+        .new_program_address(new_program_address)
 
     );
 
-    always @(result) begin
-        hold_command <= 1'b1;
-        hold_program <= 1'b0;
-    end
+    always @(posedge clk) begin
+        if (reset) begin
+            command_length <= 2'b00;
+            hold_command <= 1'b1;
+            hold_program <= 1'b0;
+        end
+        else begin
 
-    always @(target_program_data_address) begin //whenever the target address changes 
-        command_length <= 2'b00;
-        hold_program <= 1'b1;
-        hold_command <= 1'b1;
-    end
-
-    always @(posedge clk) begin // Counter to get the three bytes of the commands 
-        case (command_length)
-            
-            2'b00: begin
-                program_data_address <= target_program_data_address;
-                command_length <= command_length + 2'b01;
-            end
-
-            2'b01: begin
-                program_data_address <= target_program_data_address + 7'd1;
-                command_length <= command_length + 2'b01;
-                command_mem[7:0] <= program_data_out;
-
-            end
-
-            2'b10: begin
-                program_data_address <= target_program_data_address + 7'd2;
-                command_length <= command_length + 2'b01;
-                command_mem[15:8] <= program_data_out;
-            end
-
-            2'b11: begin
-                command_mem[23:16] <= program_data_out;
+            // Start fetching a new command
+            if (new_program_address) begin
                 command_length <= 2'b00;
-                hold_command <= 1'b0;
+                hold_program <= 1'b1;
+                hold_command <= 1'b1;
             end
 
-            default: begin
-                command_length <= 2'b00;
+            // Fetch command bytes
+            else if (hold_program) begin
+                case (command_length)
+
+                    2'b00: begin
+                        program_data_address <= target_program_data_address;
+                        command_length <= 2'b01;
+                    end
+
+                    2'b01: begin
+                        command_mem[7:0] <= program_data_out;
+                        program_data_address <= target_program_data_address + 7'd1;
+                        command_length <= 2'b10;
+                    end
+
+                    2'b10: begin
+                        command_mem[15:8] <= program_data_out;
+                        program_data_address <= target_program_data_address + 7'd2;
+                        command_length <= 2'b11;
+                    end
+
+                    2'b11: begin
+                        command_mem[23:16] <= program_data_out;
+                        command_length <= 2'b00;
+                        hold_program <= 1'b0;
+                        hold_command <= 1'b0;
+                    end
+
+                endcase
             end
-        endcase
+        end
     end
 
 `ifdef SYNTH
