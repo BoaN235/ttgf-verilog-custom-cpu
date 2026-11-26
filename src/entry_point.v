@@ -62,6 +62,7 @@ module tt_um_cpu (
     reg hold_command;
     wire restart_program;
     wire command_done;
+    wire new_program_address;
 
     assign uio_out = result;
 
