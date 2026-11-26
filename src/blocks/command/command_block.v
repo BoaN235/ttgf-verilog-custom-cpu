@@ -12,14 +12,17 @@ module command_block (
 );
 
     reg value_mem [23:0]
-    reg program_mem [23:0]
-    reg selector [3:0];
+    reg command_mem [23:0]
+    reg [3:0] selector;
+    reg [1:0] command_length;
     
-    alu_logic_block alu_logic (clk, reset, selector, executing, write_enable, data_address);
-    control_flow_block control_flow (clk, reset, selector, executing, write_enable, data_address, cmd_address);
-    data_transfer_block data_transfer (clk, reset, selector, executing, write_enable, data_address);
+    control_flow_block control_flow (clk, reset, selector, value_mem, command_mem, write_enable, data_address, cmd_address);
 
-    always @(program_ram_data) begin
+    always @(selector) begin
+        command_length = 2'b0
+    end 
+
+    always @(posedge clk) begin
         if (selector == 15) begin // I split it up so its easier to read and understand each cmd
             case (program_ram_data [3:0])  // -> = return value to working memory when cmd ends
                 4'b0000:   selector = 0; // 0000 End x
@@ -31,12 +34,12 @@ module command_block (
                                     // [ ALU - Math & Logic ]
                 4'b0101:   selector = 5;  // 0101 Math (See Math Instructions) x
                 4'b0110:   selector = 6;  // 1001 Logic (See Logic Instruction) x
-                4'b1011:   selector = 11; // 1100 Shift R/L (See Shift Instructions) x
+                4'b0111:   selector = 7; // 1100 Shift R/L (See Shift Instructions) x
                                     // [ Control FLow - Functions & Conditionals ]
-                4'b1100:   selector = 12;  // 1100 If () x
-                4'b1101:   selector = 13;  // 1100 Return () x
-                4'b1110:   selector = 14;  // 1100 Jump () x
-                4'b0111:   selector = 7;  // 1100 Wait () x
+                4'b1000:   selector = 8;  // 1100 If () x
+                4'b1001:   selector = 9;  // 1100 Return () x
+                4'b1010:   selector = 10;  // 1100 Jump () x
+                4'b1011:   selector = 11;  // 1100 Wait () x
                 default: selector = 0;  // 0000 End
             endcase
         end

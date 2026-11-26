@@ -2,11 +2,15 @@ module control_flow_block (
     input wire clk, 
     input wire reset, 
     input wire selector, 
-    output reg executing, 
+    input wire values,
+    input wire command,
     output reg write_enable, 
     output reg [5:0] data_address, 
     output reg [6:0] cmd_address
 );
+
+
+
 
 endmodule
 
@@ -30,7 +34,44 @@ endmodule
 
 
 
-module cmd_ (
+module cmd_save (
+    input clk,
+    input reset,
+    input selector,
+    input program_data
+);
+
+
+    always @(posedge clk) begin
+        if (selector == 0) begin
+            
+        end
+    end
+
+
+endmodule
+
+module cmd_write (
+    input clk,
+    input reset,
+    input selector,
+    input program_data
+);
+
+
+    always @(posedge clk) begin
+        if (selector == 0) begin
+            
+        end
+    end
+
+
+endmodule
+
+
+
+
+module cmd_copy (
     input clk,
     input reset,
     input selector,
