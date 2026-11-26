@@ -4,24 +4,21 @@ module command_block (
     input wire hold_command,
 
     input wire [23:0] command_mem,
-    input wire [23:0] value_mem, 
+    input wire [23:0] value_mem,
 
-    output wire jump_bool
+    output wire jump_bool,
     output reg write_enable,
     output reg [5:0] data_address,
-    output reg [6:0] cmd_address
+    output reg [6:0] cmd_address,
     output reg restart_program,
     output reg hold_program,
-    output wire result
+    output reg [7:0] result
 );
 
     reg [3:0] selector;
     reg [1:0] command_length;
-    reg [7:0] result;
     reg [3:0] counter;
-
-
-    assign {cmd_address, data_address} = 0;
+    
 
     always @(posedge clk) begin
         if (!hold_command) begin // I split it up so its easier to read and understand each cmd

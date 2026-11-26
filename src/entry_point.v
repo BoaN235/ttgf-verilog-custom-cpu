@@ -35,7 +35,7 @@ module tt_um_cpu (
     assign uio_oe  = 8'h00;
 
     wire program_write_enable;
-    wire [6:0] program_data_address;
+    reg [6:0] program_data_address;
     reg [6:0] target_program_data_address;
 
     wire data_write_enable;
@@ -53,10 +53,16 @@ module tt_um_cpu (
     reg [23:0] command_mem;
     reg [23:0] value_mem;
 
+    wire jump_bool;
+    wire [7:0] result;
+
+    reg [1:0] command_length;
 
     reg hold_program;
     reg hold_command;
     wire restart_program;
+
+    assign uio_out = result;
 
     command_block command (
 
@@ -72,11 +78,11 @@ module tt_um_cpu (
         .jump_bool(jump_bool),
         .cmd_address(cmd_address),
         
-        .write_enable(memory_write),
+        .write_enable(data_write_enable),
         .data_address(data_address),
         .hold_program(hold_program),
 
-        .result(uio_out)
+        .result(result)
 
     );
 
