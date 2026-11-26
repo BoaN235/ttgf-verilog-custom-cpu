@@ -87,12 +87,12 @@ module tt_um_cpu (
         .restart_program(restart_program),
         
         .executing(hold_program),
-        .cmd_address(cmd_address)
-        .jump_bool(jump_bool)
+        .cmd_address(cmd_address),
+        .jump_bool(jump_bool),
 
 
         .write_enable(program_write_enable),
-        .program_data_address(target_program_data_address),
+        .program_data_address(target_program_data_address)
 
     );
 
