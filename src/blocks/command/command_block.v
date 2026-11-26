@@ -1,4 +1,3 @@
-
 module command_block (
     input wire clk,
     input wire reset,
@@ -40,7 +39,7 @@ module command_block (
             case (command_mem[3:0])
 
                 4'b0000: begin // End
-                    selector = 4'd0;
+                    selector <= 4'd0;
                 end
 
                 // DATA TRANSFER
@@ -49,8 +48,8 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd1;
-                            write_enable = 1'b0;
+                            selector <= 4'd1;
+                            write_enable <= 1'b0;
                             counter <= 2'b01;
                         end
 
@@ -67,8 +66,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -77,8 +76,8 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd2;
-                            write_enable = 1'b1;
+                            selector <= 4'd2;
+                            write_enable <= 1'b1;
                             counter <= 2'b01;
                         end
 
@@ -95,8 +94,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -105,8 +104,8 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd3;
-                            write_enable = 1'b1;
+                            selector <= 4'd3;
+                            write_enable <= 1'b1;
                             counter <= 2'b01;
                         end
 
@@ -123,8 +122,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -133,8 +132,8 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd4;
-                            write_enable = 1'b1;
+                            selector <= 4'd4;
+                            write_enable <= 1'b1;
                             counter <= 2'b01;
                         end
 
@@ -151,8 +150,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -163,7 +162,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd5;
+                            selector <= 4'd5;
                             counter <= 2'b01;
                         end
 
@@ -180,8 +179,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -190,7 +189,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd6;
+                            selector <= 4'd6;
                             counter <= 2'b01;
                         end
 
@@ -207,8 +206,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -217,7 +216,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd7;
+                            selector <= 4'd7;
                             counter <= 2'b01;
                         end
 
@@ -234,8 +233,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -246,7 +245,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd8;
+                            selector <= 4'd8;
                             counter <= 2'b01;
                         end
 
@@ -263,8 +262,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -273,7 +272,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd9;
+                            selector <= 4'd9;
                             counter <= 2'b01;
                         end
 
@@ -290,8 +289,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -300,7 +299,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd10;
+                            selector <= 4'd10;
                             counter <= 2'b01;
                         end
 
@@ -317,8 +316,8 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
@@ -327,7 +326,7 @@ module command_block (
 
                     case (counter)
                         2'b00: begin
-                            selector = 4'd11;
+                            selector <= 4'd11;
                             counter <= 2'b01;
                         end
 
@@ -344,14 +343,14 @@ module command_block (
                         end
 
                         default: begin
-                            selector = 4'd15;
-                            hold_program = 1'b0;
+                            selector <= 4'd15;
+                            hold_program <= 1'b0;
                         end
                     endcase
                 end
 
                 default: begin
-                    selector = 4'd15;
+                    selector <= 4'd15;
                 end
 
             endcase
