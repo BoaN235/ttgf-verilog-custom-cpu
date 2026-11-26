@@ -39,9 +39,10 @@ module program_block (
             else begin
                 program_data_address <= program_data_address + 7'b11;
             end
-            new_program_address <= 1'b1
-        end else begin
-            new_program_address <= 1'b0
+            new_program_address <= 1'b1;
+        end
+        else begin
+            new_program_address <= 1'b0;
         end
     end
 
