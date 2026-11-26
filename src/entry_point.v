@@ -37,6 +37,7 @@ module tt_um_cpu (
 
     wire program_write_enable;
     wire [6:0] program_data_address;
+    reg [6:0] target_program_data_address;
 
     wire data_write_enable;
     wire [5:0] data_address;
@@ -48,30 +49,90 @@ module tt_um_cpu (
     // Output multiplexer: select which SRAM based on ui_in[7]
     assign uo_out  = ui_in[7] ? data_out : program_data_out;
 
-    wire restart_program;
-
     wire [6:0] cmd_address;
 
+    reg [23:0] command_mem;
+    reg [23:0] value_mem;
+
+
+    reg hold_program;
+    reg hold_command;
+    wire restart_program;
+
     command_block command (
+
         .clk(clk),
         .reset(~rst_n),
-        .program_ram_data(program_data_out),
+        .hold_command(hold_command),
+
+        .command_mem(command_mem),
+        .value_mem(value_mem),
+
         .restart_program(restart_program),
-        .executing(executing_cmd),
+        
+        .jump_bool(jump_bool),
         .cmd_address(cmd_address),
-        .write_enable(data_write_enable),
-        .data_address(data_address)
+        
+        .write_enable(memory_write),
+        .data_address(data_address),
+        .hold_program(hold_program)
+
     );
 
     program_block programs (
+
         .clk(clk),
         .reset(~rst_n),
         .restart_program(restart_program),
-        .executing(executing_cmd),
-        .write_enable(program_write_enable),
-        .program_data_address(program_data_address),
+        
+        .executing(hold_program),
         .cmd_address(cmd_address)
+        .jump_bool(jump_bool)
+
+
+        .write_enable(program_write_enable),
+        .program_data_address(target_program_data_address),
+
     );
+
+    always @(target_program_data_address) begin //whenever the target address changes 
+        command_length = 2'b00;
+        hold_program = 1'b1;
+        hold_command = 1'b1;
+    end
+
+    always @(posedge clk) begin // Counter to get the three bytes of the commands 
+        case (command_length)
+            
+            2'b00: begin
+                program_data_address <= target_program_data_address;
+                command_length <= command_length + 2'b01;
+            end
+
+            2'b01: begin
+                program_data_address <= target_program_data_address + 7'd1;
+                command_length <= command_length + 2'b01;
+                command_mem[7:0] <= program_data_out;
+
+            end
+
+            2'b10: begin
+                program_data_address <= target_program_data_address + 7'd2;
+                command_length <= command_length + 2'b01;
+                command_mem[15:8] <= program_data_out;
+            end
+
+            2'b11: begin
+                command_mem[23:16] <= program_data_out;
+                command_length <= 2'b00;
+                hold_command <= 1'b0;
+            end
+
+            default: begin
+                command_length <= 2'b00;
+            end
+        endcase
+    end
 
 `ifdef SYNTH
     // Tiny Tapeout's FPGA workflow defines SYNTH. Use inferred memories
@@ -167,33 +228,6 @@ module tt_um_cpu (
 `endif
 
     // ui_in[7] is used for memory select (0=program, 1=data)
-
-endmodule
-
-
-module command_block (
-    input wire clk,
-    input wire reset,
-    input wire [7:0] program_ram_data,
-
-    output wire restart_program,
-    output reg [3:0] executing,
-
-    output reg write_enable,
-    output reg [5:0] data_address,
-    output reg [6:0] cmd_address
-);
-
-wire unused = clk | reset;
-wire [7:0] unused_2 = program_ram_data;
-
-assign {
-    restart_program,
-    executing,
-    write_enable,
-    data_address,
-    cmd_address
-} = 0;
 
 endmodule
 

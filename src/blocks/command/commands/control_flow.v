@@ -1,10 +1,9 @@
 module control_flow_block (
     input wire clk, 
     input wire reset, 
-    input wire selector, 
-    input wire values,
-    input wire command,
-    output reg write_enable, 
+    input wire [3:0] selector, 
+    input wire [23:0] values,
+    input wire [23:0] command,
     output reg [5:0] data_address, 
     output reg [6:0] cmd_address
 );

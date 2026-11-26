@@ -15,6 +15,10 @@ project:
   source_files:
     - "entry_point.v"
     - "blocks/program/program_block.v"
+    - "blocks/command/command_block.v"
+#   - "blocks/command/commands/alu_logic.v"
+#   - "blocks/command/commands/control_flow.v"
+#   - "blocks/command/commands/data_transfer.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
