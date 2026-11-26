@@ -26,18 +26,15 @@ module program_block (
             end
         end
 
-        else if (executing == 4'b0000) begin // If there is no command executing 
-            if (restart_program) begin
+        else if (executing == 4'b0000) begin // If there is no command executing and program is not being loaded start the run counter
+            if (restart_program || program_data_address == 7'd127) begin // If a reset program signal was sent or if the program reached the end then restart counter
                 program_data_address <= 7'd0;
             end 
-            else if (executing == 4'b1100 || executing == 4'b1101 || executing == 4'b1110) begin
+            else if (executing == 4'b1100 || executing == 4'b1101 || executing == 4'b1110) begin // if any of the jump commands are sent stop counting and send the cmd address 
                 if (cmd_address != 7'b0000000) begin
                 program_data_address <= cmd_address;
                 end
             end 
-            else if (program_data_address == 7'd127) begin
-                program_data_address <= 7'd0;
-            end
             else begin
                 program_data_address <= program_data_address + 2'b11;
             end
