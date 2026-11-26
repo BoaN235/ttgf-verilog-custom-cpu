@@ -174,13 +174,14 @@ endmodule
 module command_block (
     input wire clk,
     input wire reset,
+    input [7:0] program_ram_data,
 
-    output wire restart_program,
-    output wire executing,
+    output reg restart_program,
+    output reg executing,
 
-    output wire write_enable,
-    output wire [5:0] data_address,
-    output wire [6:0] cmd_address
+    output reg write_enable,
+    output reg [5:0] data_address,
+    output reg [6:0] cmd_address
 );
 
 wire unused = clk | reset;
