@@ -41,7 +41,7 @@ module tt_um_cpu (
     wire data_write_enable;
     wire [5:0] data_address;
 
-    wire executing_cmd;
+    wire [3:0] executing_cmd;
 
     wire unused = &{1'b0, ui_in[6:0]};
 
@@ -55,6 +55,7 @@ module tt_um_cpu (
     command_block command (
         .clk(clk),
         .reset(~rst_n),
+        .program_ram_data(program_data_out)
         .restart_program(restart_program),
         .executing(executing_cmd),
         .cmd_address(cmd_address),
@@ -169,5 +170,22 @@ module tt_um_cpu (
 
 endmodule
 
+
+module command_block (
+        input wire clk,
+        input wire reset,
+
+        output reg restart_program,
+        output reg executing,
+
+        output reg write_enable,
+        output reg [5:0] data_address,
+        output reg [6:0] cmd_address
+);
+
+wire unused = {clk, reset}
+assign {restart_program, executing, write_enable, data_address, cmd_address} = 0
+
+endmodule
 
 `default_nettype wire

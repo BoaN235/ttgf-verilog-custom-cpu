@@ -1,6 +1,7 @@
 module command_block (
     input wire clk,
     input wire reset,
+    input [7:0] program_ram_data,
 
     output reg restart_program,
     output reg executing,
@@ -10,18 +11,19 @@ module command_block (
     output reg [6:0] cmd_address
 );
 
-    reg working_mem [19:0]
+    reg value_mem [23:0]
+    reg program_mem [23:0]
     reg selector [3:0];
     
     alu_logic_block alu_logic (clk, reset, selector, executing, write_enable, data_address);
     control_flow_block control_flow (clk, reset, selector, executing, write_enable, data_address, cmd_address);
     data_transfer_block data_transfer (clk, reset, selector, executing, write_enable, data_address);
 
-    always @(command) begin
+    always @(program_ram_data) begin
         if (selector == 15) begin // I split it up so its easier to read and understand each cmd
-            case (command [3:0])  // -> = return value to working memory when cmd ends
+            case (program_ram_data [3:0])  // -> = return value to working memory when cmd ends
                 4'b0000:   selector = 0; // 0000 End x
-                                    // [ DATA TRANSFER - saving or reading data ]
+                                    // [ DATA TRANSFER  saving or reading data ]
                 4'b0001:   selector = 1;  // 0001 Read (output Num at address) Done
                 4'b0010:   selector = 2;  // 0010 Save (Save -> at address) Done
                 4'b0011:   selector = 3;  // 0011 Write (Save Num x at address) Done
