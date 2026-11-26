@@ -32,7 +32,6 @@ module tt_um_cpu (
     wire [7:0] program_data_out;  // Program memory output
     wire [7:0] data_out;  // Data memory output
 
-    assign uio_out = 8'h00;
     assign uio_oe  = 8'h00;
 
     wire program_write_enable;
@@ -75,7 +74,9 @@ module tt_um_cpu (
         
         .write_enable(memory_write),
         .data_address(data_address),
-        .hold_program(hold_program)
+        .hold_program(hold_program),
+
+        .result(uio_out)
 
     );
 
@@ -95,10 +96,15 @@ module tt_um_cpu (
 
     );
 
+    always @(result) begin
+        hold_command <= 1'b1;
+        hold_program <= 1'b0;
+    end
+
     always @(target_program_data_address) begin //whenever the target address changes 
-        command_length = 2'b00;
-        hold_program = 1'b1;
-        hold_command = 1'b1;
+        command_length <= 2'b00;
+        hold_program <= 1'b1;
+        hold_command <= 1'b1;
     end
 
     always @(posedge clk) begin // Counter to get the three bytes of the commands 
