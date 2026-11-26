@@ -172,19 +172,26 @@ endmodule
 
 
 module command_block (
-        input wire clk,
-        input wire reset,
+    input wire clk,
+    input wire reset,
 
-        output reg restart_program,
-        output reg executing,
+    output wire restart_program,
+    output wire executing,
 
-        output reg write_enable,
-        output reg [5:0] data_address,
-        output reg [6:0] cmd_address
+    output wire write_enable,
+    output wire [5:0] data_address,
+    output wire [6:0] cmd_address
 );
 
-wire unused = {clk, reset}
-assign {restart_program, executing, write_enable, data_address, cmd_address} = 0
+wire unused = clk | reset;
+
+assign {
+    restart_program,
+    executing,
+    write_enable,
+    data_address,
+    cmd_address
+} = 0;
 
 endmodule
 
