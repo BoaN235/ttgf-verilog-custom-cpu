@@ -50,9 +50,26 @@ module tt_um_cpu (
 
     reg restart_program = 1'b0;
 
-    command_block command (.clk(clk), reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .cmd_address(cmd_address), .write_enable(data_write_enable), .data_address(data_address));
-    program_block programs (.clk(clk), .reset(~rst_n), .restart_program(restart_program), .executing(executing_cmd), .write_enable(program_write_enable), .program_data_address(program_data_address), .cmd_address(cmd_address));
+    command_block command (
+        .clk(clk),
+        .reset(~rst_n),
+        .restart_program(restart_program),
+        .executing(executing_cmd),
+        .cmd_address(cmd_address),
+        .write_enable(data_write_enable),
+        .data_address(data_address)
+    );
 
+    program_block programs (
+        .clk(clk),
+        .reset(~rst_n),
+        .restart_program(restart_program),
+        .executing(executing_cmd),
+        .write_enable(program_write_enable),
+        .program_data_address(program_data_address),
+        .cmd_address(cmd_address)
+    );
+    
 `ifdef SYNTH
     // Tiny Tapeout's FPGA workflow defines SYNTH. Use inferred memories
     // on FPGA; the GF180 hard macros are only available in the ASIC flow.
