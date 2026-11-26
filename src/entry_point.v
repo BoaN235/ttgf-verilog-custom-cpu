@@ -105,7 +105,7 @@ module tt_um_cpu (
     );
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (~rst_n) begin
             command_length <= 2'b00;
             hold_command <= 1'b1;
             hold_program <= 1'b0;
