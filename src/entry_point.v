@@ -185,7 +185,7 @@ module command_block (
 );
 
 wire unused = clk | reset;
-wire [7:0] unused_2 = program_ram_data
+wire [7:0] unused_2 = program_ram_data;
 
 assign {
     restart_program,
