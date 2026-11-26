@@ -80,7 +80,6 @@ module tt_um_cpu (
         
         .write_enable(data_write_enable),
         .data_address(data_address),
-        .hold_program(hold_program),
 
         .result(result)
 

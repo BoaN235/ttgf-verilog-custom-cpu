@@ -11,7 +11,6 @@ module command_block (
     output reg [5:0] data_address,
     output reg [6:0] cmd_address,
     output reg restart_program,
-    output reg hold_program,
     output reg [7:0] result
 );
 
@@ -31,7 +30,6 @@ module command_block (
             data_address     <= 6'd0;
             cmd_address      <= 7'd0;
             restart_program  <= 1'b0;
-            hold_program     <= 1'b0;
             result           <= 8'd0;
         end
         else if (!hold_command) begin
