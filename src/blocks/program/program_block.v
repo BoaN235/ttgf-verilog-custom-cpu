@@ -10,26 +10,28 @@ module program_block (
 );
 
     always @(posedge clk) begin
-        if (reset) begin
+        if (reset) begin // On reset start the load counter of the program to RAM
             program_data_address <= 7'd0;
             write_enable <= 1'b1;
         end
 
-        else if (write_enable) begin
-            if (program_data_address == 7'd127) begin
+        else if (write_enable) begin // load each chunk of the program to a part of memory
+            if (program_data_address == 7'd127) begin // If the loading is done set the ram to read only and start the program at 0
                 write_enable <= 1'b0;
                 program_data_address <= 7'd0;
-            end else begin
+            end 
+            
+            else begin // if the loading is not done increase the program load address by one
                 program_data_address <= program_data_address + 1'b1;
             end
         end
 
-        else if (executing == 4'b0000) begin
+        else if (executing == 4'b0000) begin // If there is no command executing 
             if (restart_program) begin
                 program_data_address <= 7'd0;
             end 
-            else if (executing == 4'b1100 or executing == 4'b1101 or executing == 4'b1110) begin
-                if (cmd_address != 1'b0000000) begin
+            else if (executing == 4'b1100 || executing == 4'b1101 || executing == 4'b1110) begin
+                if (cmd_address != 7'b0000000) begin
                 program_data_address <= cmd_address;
                 end
             end 
