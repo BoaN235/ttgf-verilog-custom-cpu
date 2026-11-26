@@ -48,7 +48,7 @@ module tt_um_cpu (
     // Output multiplexer: select which SRAM based on ui_in[7]
     assign uo_out  = ui_in[7] ? data_out : program_data_out;
 
-    reg restart_program = 1'b0;
+    wire restart_program;
 
     wire [6:0] cmd_address;
 
@@ -176,7 +176,7 @@ module command_block (
     input wire reset,
     input wire [7:0] program_ram_data,
 
-    output reg restart_program,
+    output wire restart_program,
     output reg [3:0] executing,
 
     output reg write_enable,
