@@ -190,24 +190,37 @@ module tt_um_cpu (
     wire VGND;
 
     // ------------------------------------------------------------------------
-    // HOLD-TIMING FIX
-    //
-    // Add combinational delay between the address/write-enable registers
-    // and the SRAM inputs to resolve the post-route hold violations.
-    //
-    // GF180 standard cells have explicit power/body pins:
-    //   VDD -> VPWR
-    //   VSS -> VGND
-    //   VNW -> VPWR
-    //   VPW -> VGND
+    // Hold timing is improved by registering every macro input in this
+    // branch.  CEN is held inactive during reset and none of the macro inputs
+    // is allowed to switch combinationally with a falling edge of the clock.
     // ------------------------------------------------------------------------
 
     reg [6:0] sram_program_address;
-    reg       sram_data_write_enable;
+    reg [5:0] sram_data_address;
+    reg [7:0] sram_data;
+    reg       sram_program_cen;
+    reg       sram_data_cen;
+    reg       sram_program_gwen;
+    reg       sram_data_gwen;
 
     always @(posedge clk) begin
-        sram_program_address <= program_data_address;
-        sram_data_write_enable <= data_write_enable;
+        if (!rst_n) begin
+            sram_program_address <= 7'd0;
+            sram_data_address <= 6'd0;
+            sram_data <= 8'd0;
+            sram_program_cen <= 1'b1;
+            sram_data_cen <= 1'b1;
+            sram_program_gwen <= 1'b1;
+            sram_data_gwen <= 1'b1;
+        end else begin
+            sram_program_address <= program_data_address;
+            sram_data_address <= data_address;
+            sram_data <= uio_in;
+            sram_program_cen <= ~ena;
+            sram_data_cen <= ~ena;
+            sram_program_gwen <= ~program_write_enable;
+            sram_data_gwen <= ~data_write_enable;
+        end
     end
 
     // ------------------------------------------------------------------------
@@ -218,11 +231,11 @@ module tt_um_cpu (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
-        .CEN  (~(ena & rst_n)),
-        .GWEN (~program_write_enable),
+        .CEN  (sram_program_cen),
+        .GWEN (sram_program_gwen),
         .WEN  (8'h00),
         .A    (sram_program_address),
-        .D    (uio_in),
+        .D    (sram_data),
         .Q    (program_data_out)
     );
 
@@ -234,11 +247,11 @@ module tt_um_cpu (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
-        .CEN  (~(ena & rst_n)),
-        .GWEN (~sram_data_write_enable),
+        .CEN  (sram_data_cen),
+        .GWEN (sram_data_gwen),
         .WEN  (8'h00),
-        .A    (data_address),
-        .D    (uio_in),
+        .A    (sram_data_address),
+        .D    (sram_data),
         .Q    (data_out)
     );
 
