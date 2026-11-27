@@ -189,7 +189,6 @@ module tt_um_cpu (
     wire VPWR;
     wire VGND;
 
-```verilog
     // ------------------------------------------------------------------------
     // HOLD-TIMING FIX
     //
