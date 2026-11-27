@@ -49,7 +49,7 @@
         "sram1": {
           "location": [
             250,
-            150
+            125
           ],
           "orientation": "S"
         }
@@ -80,7 +80,7 @@
         "sram2": {
           "location": [
             250,
-            450
+            475
           ],
           "orientation": "N"
         }
