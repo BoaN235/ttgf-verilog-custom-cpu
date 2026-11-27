@@ -231,7 +231,9 @@ module tt_um_cpu (
                 .I   (program_data_address[i]),
                 .Z   (sram_program_address[i]),
                 .VDD (VPWR),
-                .VSS (VGND)
+                .VSS (VGND),
+                .VNW (VPWR),
+                .VPW (VGND)
             );
 
         end
@@ -241,7 +243,9 @@ module tt_um_cpu (
         .I   (data_write_enable),
         .Z   (sram_data_write_enable),
         .VDD (VPWR),
-        .VSS (VGND)
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
 
