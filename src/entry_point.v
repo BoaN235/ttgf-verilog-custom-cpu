@@ -222,10 +222,6 @@ module tt_um_cpu (
     wire [6:0] sram_program_address;
     wire       sram_data_write_enable;
 
-    // Program SRAM address delay
-    //
-    // One buffer is instantiated for each bit of the 7-bit address bus.
-    //
     genvar i;
 
     generate
@@ -235,24 +231,17 @@ module tt_um_cpu (
                 .I   (program_data_address[i]),
                 .Z   (sram_program_address[i]),
                 .VDD (VPWR),
-                .VSS (VGND),
-                .VNW (VPWR),
-                .VPW (VGND)
+                .VSS (VGND)
             );
 
         end
     endgenerate
 
-
-    // Data SRAM write-enable delay
-
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_data_write_enable (
         .I   (data_write_enable),
         .Z   (sram_data_write_enable),
         .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VSS (VGND)
     );
 
 
