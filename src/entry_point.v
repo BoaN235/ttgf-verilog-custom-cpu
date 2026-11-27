@@ -205,71 +205,8 @@ module tt_um_cpu (
     wire [6:0] sram_program_address;
     wire       sram_data_write_enable;
 
-    // Program address delay buffers.
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_0 (
-        .I   (program_data_address[0]),
-        .Z   (sram_program_address[0]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_1 (
-        .I   (program_data_address[1]),
-        .Z   (sram_program_address[1]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_2 (
-        .I   (program_data_address[2]),
-        .Z   (sram_program_address[2]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_3 (
-        .I   (program_data_address[3]),
-        .Z   (sram_program_address[3]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_4 (
-        .I   (program_data_address[4]),
-        .Z   (sram_program_address[4]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_5 (
-        .I   (program_data_address[5]),
-        .Z   (sram_program_address[5]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_6 (
-        .I   (program_data_address[6]),
-        .Z   (sram_program_address[6]),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
-
-    // Data SRAM write-enable delay buffer.
-    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_data_write_enable (
-        .I   (data_write_enable),
-        .Z   (sram_data_write_enable),
-        .VDD (VPWR),
-        .VSS (VGND),
-        .VNW (VPWR)
-    );
+    assign sram_program_address = program_data_address;
+    assign sram_data_write_enable = data_write_enable;
 
     // ------------------------------------------------------------------------
     // Program SRAM
