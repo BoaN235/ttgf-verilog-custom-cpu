@@ -189,71 +189,97 @@ module tt_um_cpu (
     wire VPWR;
     wire VGND;
 
+```verilog
     // ------------------------------------------------------------------------
     // HOLD-TIMING FIX
     //
-    // The post-route STA showed very short register -> SRAM paths:
+    // Add combinational delay between the address/write-enable registers
+    // and the SRAM inputs to resolve the post-route hold violations.
     //
-    //   program_data_address[2] -> sram1/A[2] : -0.168 ns hold
-    //   program_data_address[0] -> sram1/A[0] : ~-0.156 ns hold
-    //   ...
-    //
-    // The SRAM clock arrives later than the register clock, producing a
-    // negative hold requirement. Add physical delay using GF180 buffers.
-    //
-    // These are combinational buffers, NOT pipeline registers, so they do
-    // not change the CPU's cycle-level behavior.
+    // GF180 standard cells have explicit power/body pins:
+    //   VDD -> VPWR
+    //   VSS -> VGND
+    //   VNW -> VPWR
+    //   VPW -> VGND
     // ------------------------------------------------------------------------
 
     wire [6:0] sram_program_address;
-    wire        sram_data_write_enable;
+    wire       sram_data_write_enable;
 
-    // Program address delay.
-    //
-    // One buffer per address bit is intentionally used so that the address
-    // bits all receive approximately the same physical treatment.
+    // Program address delay buffers.
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_0 (
-        .I(program_data_address[0]),
-        .Z(sram_program_address[0])
+        .I   (program_data_address[0]),
+        .Z   (sram_program_address[0]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_1 (
-        .I(program_data_address[1]),
-        .Z(sram_program_address[1])
+        .I   (program_data_address[1]),
+        .Z   (sram_program_address[1]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_2 (
-        .I(program_data_address[2]),
-        .Z(sram_program_address[2])
+        .I   (program_data_address[2]),
+        .Z   (sram_program_address[2]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_3 (
-        .I(program_data_address[3]),
-        .Z(sram_program_address[3])
+        .I   (program_data_address[3]),
+        .Z   (sram_program_address[3]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_4 (
-        .I(program_data_address[4]),
-        .Z(sram_program_address[4])
+        .I   (program_data_address[4]),
+        .Z   (sram_program_address[4]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_5 (
-        .I(program_data_address[5]),
-        .Z(sram_program_address[5])
+        .I   (program_data_address[5]),
+        .Z   (sram_program_address[5]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_6 (
-        .I(program_data_address[6]),
-        .Z(sram_program_address[6])
+        .I   (program_data_address[6]),
+        .Z   (sram_program_address[6]),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
 
-    // Data SRAM write-enable delay.
-    //
-    // _307_/Q -> sram2/GWEN was another hold violation.
+    // Data SRAM write-enable delay buffer.
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_data_write_enable (
-        .I(data_write_enable),
-        .Z(sram_data_write_enable)
+        .I   (data_write_enable),
+        .Z   (sram_data_write_enable),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
     );
+```
 
     // ------------------------------------------------------------------------
     // Program SRAM
