@@ -2,7 +2,7 @@ module program_block (
     input wire clk,
     input wire reset,
     input wire restart_program,
-    
+
     input wire hold_program,
     input wire jump_bool,
     input wire [6:0] cmd_address,
@@ -13,34 +13,45 @@ module program_block (
 );
 
     always @(posedge clk) begin
-        if (reset) begin // On reset start the load counter of the program to RAM
+        if (reset) begin
+            // Start loading the program into SRAM.
             program_data_address <= 7'd0;
             write_enable <= 1'b1;
+            new_program_address <= 1'b0;
         end
 
-        else if (write_enable) begin // load each chunk of the program to a part of memory
-            if (program_data_address == 7'd127) begin // If the loading is done set the ram to read only and start the program at 0
+        else if (write_enable) begin
+            // Load each byte of the program into memory.
+            if (program_data_address == 7'd127) begin
+                // Loading is complete.
                 write_enable <= 1'b0;
                 program_data_address <= 7'd0;
-            end 
-            
-            else begin // if the loading is not done increase the program load address by one
-                program_data_address <= program_data_address + 1'b1;
+                new_program_address <= 1'b0;
+            end
+            else begin
+                program_data_address <= program_data_address + 7'd1;
+                new_program_address <= 1'b0;
             end
         end
 
-        else if (!hold_program) begin // If there is no command executing and program is not being loaded start the run counter
-            if (restart_program || program_data_address == 7'd127) begin // If a reset program signal was sent or if the program reached the end then restart counter
+        else if (!hold_program) begin
+            // Start the run counter when the program is not being held.
+            if (restart_program || program_data_address == 7'd127) begin
                 program_data_address <= 7'd0;
-            end 
-            else if (jump_bool) begin // if any of the jump commands are sent stop counting and send the cmd address 
-                program_data_address <= cmd_address;
-            end 
-            else begin
-                program_data_address <= program_data_address + 7'b11;
             end
+
+            else if (jump_bool) begin
+                program_data_address <= cmd_address;
+            end
+
+            else begin
+                // Commands are three bytes long.
+                program_data_address <= program_data_address + 7'd3;
+            end
+
             new_program_address <= 1'b1;
         end
+
         else begin
             new_program_address <= 1'b0;
         end

@@ -189,6 +189,76 @@ module tt_um_cpu (
     wire VPWR;
     wire VGND;
 
+    // ------------------------------------------------------------------------
+    // HOLD-TIMING FIX
+    //
+    // The post-route STA showed very short register -> SRAM paths:
+    //
+    //   program_data_address[2] -> sram1/A[2] : -0.168 ns hold
+    //   program_data_address[0] -> sram1/A[0] : ~-0.156 ns hold
+    //   ...
+    //
+    // The SRAM clock arrives later than the register clock, producing a
+    // negative hold requirement. Add physical delay using GF180 buffers.
+    //
+    // These are combinational buffers, NOT pipeline registers, so they do
+    // not change the CPU's cycle-level behavior.
+    // ------------------------------------------------------------------------
+
+    wire [6:0] sram_program_address;
+    wire        sram_data_write_enable;
+
+    // Program address delay.
+    //
+    // One buffer per address bit is intentionally used so that the address
+    // bits all receive approximately the same physical treatment.
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_0 (
+        .I(program_data_address[0]),
+        .Z(sram_program_address[0])
+    );
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_1 (
+        .I(program_data_address[1]),
+        .Z(sram_program_address[1])
+    );
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_2 (
+        .I(program_data_address[2]),
+        .Z(sram_program_address[2])
+    );
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_3 (
+        .I(program_data_address[3]),
+        .Z(sram_program_address[3])
+    );
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_4 (
+        .I(program_data_address[4]),
+        .Z(sram_program_address[4])
+    );
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_5 (
+        .I(program_data_address[5]),
+        .Z(sram_program_address[5])
+    );
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_6 (
+        .I(program_data_address[6]),
+        .Z(sram_program_address[6])
+    );
+
+    // Data SRAM write-enable delay.
+    //
+    // _307_/Q -> sram2/GWEN was another hold violation.
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_data_write_enable (
+        .I(data_write_enable),
+        .Z(sram_data_write_enable)
+    );
+
+    // ------------------------------------------------------------------------
+    // Program SRAM
+    // ------------------------------------------------------------------------
+
     gf180mcu_fd_ip_sram__sram128x8m8wm1 sram1 (
         .VDD  (VPWR),
         .VSS  (VGND),
@@ -196,17 +266,21 @@ module tt_um_cpu (
         .CEN  (~(ena & rst_n)),
         .GWEN (~program_write_enable),
         .WEN  (8'h00),
-        .A    (program_data_address),
+        .A    (sram_program_address),
         .D    (uio_in),
         .Q    (program_data_out)
     );
+
+    // ------------------------------------------------------------------------
+    // Data SRAM
+    // ------------------------------------------------------------------------
 
     gf180mcu_fd_ip_sram__sram64x8m8wm1 sram2 (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
         .CEN  (~(ena & rst_n)),
-        .GWEN (~data_write_enable),
+        .GWEN (~sram_data_write_enable),
         .WEN  (8'h00),
         .A    (data_address),
         .D    (uio_in),
