@@ -206,8 +206,8 @@ module tt_um_cpu (
     reg       sram_data_write_enable;
 
     always @(posedge clk) begin
-        assign sram_program_address <= program_data_address;
-        assign sram_data_write_enable <= data_write_enable;
+        sram_program_address <= program_data_address;
+        sram_data_write_enable <= data_write_enable;
     end
 
     // ------------------------------------------------------------------------
