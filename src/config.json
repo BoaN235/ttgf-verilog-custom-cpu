@@ -79,10 +79,10 @@
       "instances": {
         "sram2": {
           "location": [
-            600,
-            350
+            700,
+            45
           ],
-          "orientation": "W"
+          "orientation": "N"
         }
       }
     }
