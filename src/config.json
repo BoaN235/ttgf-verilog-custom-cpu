@@ -80,7 +80,7 @@
         "sram2": {
           "location": [
             140,
-            350
+            360
           ],
           "orientation": "N"
         }
