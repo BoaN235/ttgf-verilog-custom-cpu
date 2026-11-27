@@ -2,8 +2,8 @@
   "//": "Only export pin area in LEF (without any connected nets)",
   "PL_TARGET_DENSITY_PCT": 60,
   "CLOCK_PERIOD": 20,
-  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.2,
-  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.2,
+  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
   "RUN_LINTER": 1,
   "LINTER_INCLUDE_PDK_MODELS": 1,
   "CLOCK_PORT": "clk",
@@ -48,8 +48,8 @@
       "instances": {
         "sram1": {
           "location": [
-            140,
-            45
+            250,
+            35
           ],
           "orientation": "N"
         }
@@ -79,8 +79,8 @@
       "instances": {
         "sram2": {
           "location": [
-            140,
-            350
+            250,
+            450
           ],
           "orientation": "N"
         }
@@ -97,7 +97,7 @@
   "meta": {
     "flow": "Classic"
   },
-  "MAGIC_DRC_USE_GDS": true,
+  "MAGIC_DRC_USE_GDS": false,
   "MAGIC_EXT_ABSTRACT_CELLS": [
     "gf180mcu_fd_sc_mcu7t5v0__.*"
   ],
@@ -108,6 +108,5 @@
   "MAGIC_EXT_ABSTRACT": true,
   "ERROR_ON_MAGIC_DRC": false,
   "ERROR_ON_ILLEGAL_OVERLAPS": false,
-  "PRIMARY_GDSII_STREAMOUT_TOOL": "klayout",
-  "RUN_POST_CTS_RESIZER_TIMING": true
+  "PRIMARY_GDSII_STREAMOUT_TOOL": "klayout"
 }
