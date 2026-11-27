@@ -86,7 +86,7 @@ module tt_um_cpu (
 
     );
 
-    wire unused = &{1'b0, command_done};
+    wire unused_yes = &{1'b0, command_done};
 
     program_block programs (
 

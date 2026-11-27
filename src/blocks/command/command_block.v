@@ -19,7 +19,7 @@ module command_block (
     reg [1:0] command_length;
     reg [1:0] counter;
 
-    wire unused = &{1'b0, value_mem, command_mem, selector, command_length};
+    wire unused_no = &{1'b0, value_mem, command_mem, selector, command_length};
 
     // Temporary placeholder until jump functionality is implemented.
     assign jump_bool = 1'b0;
