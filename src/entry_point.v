@@ -29,22 +29,22 @@ module tt_um_cpu (
     input  wire       rst_n
 );
 
-    wire [7:0] program_data_out;  // Program memory output
-    wire [7:0] data_out;  // Data memory output
+    wire [7:0] program_data_out;
+    wire [7:0] data_out;
 
-    assign uio_oe  = 8'h00;
+    assign uio_oe = 8'h00;
 
     wire program_write_enable;
-    reg [6:0] program_data_address;
-    reg [6:0] target_program_data_address;
+    reg  [6:0] program_data_address;
+    reg  [6:0] target_program_data_address;
 
     wire data_write_enable;
     wire [5:0] data_address;
 
     wire unused = &{1'b0, ui_in[6:0]};
 
-    // Output multiplexer: select which SRAM based on ui_in[7]
-    assign uo_out  = ui_in[7] ? data_out : program_data_out;
+    // Output multiplexer
+    assign uo_out = ui_in[7] ? data_out : program_data_out;
 
     wire [6:0] cmd_address;
 
@@ -65,7 +65,6 @@ module tt_um_cpu (
     assign uio_out = result;
 
     command_block command (
-
         .clk(clk),
         .reset(~rst_n),
         .hold_command(hold_command),
@@ -74,35 +73,31 @@ module tt_um_cpu (
         .value_mem(value_mem),
 
         .restart_program(restart_program),
-        
+
         .jump_bool(jump_bool),
         .cmd_address(cmd_address),
-        
+
         .write_enable(data_write_enable),
         .data_address(data_address),
 
         .result(result),
         .command_done(command_done)
-
     );
 
     wire unused_yes = &{1'b0, command_done};
 
     program_block programs (
-
         .clk(clk),
         .reset(~rst_n),
         .restart_program(restart_program),
-        
+
         .hold_program(hold_program),
         .cmd_address(cmd_address),
         .jump_bool(jump_bool),
 
-
         .write_enable(program_write_enable),
         .program_data_address(target_program_data_address),
         .new_program_address(new_program_address)
-
     );
 
     always @(posedge clk) begin
@@ -153,60 +148,113 @@ module tt_um_cpu (
         end
     end
 
+
 `ifdef SYNTH
-    // Tiny Tapeout's FPGA workflow defines SYNTH. Use inferred memories
-    // on FPGA; the GF180 hard macros are only available in the ASIC flow.
-    reg [7:0] fpga_program [0:127];  // 128×8 program memory
-    reg [7:0] fpga_data [0:63];      // 64×8 data memory
+
+    // ------------------------------------------------------------------------
+    // FPGA implementation
+    // ------------------------------------------------------------------------
+
+    reg [7:0] fpga_program [0:127];
+    reg [7:0] fpga_data [0:63];
     reg [7:0] fpga_q1, fpga_q2;
 
     always @(posedge clk) begin
         if (!rst_n) begin
             fpga_q1 <= 8'h00;
             fpga_q2 <= 8'h00;
-        end else if (ena) begin
+        end
+        else if (ena) begin
+
             // Program memory
             if (program_write_enable) begin
                 fpga_program[program_data_address] <= uio_in;
-            end else begin
+            end
+            else begin
                 fpga_q1 <= fpga_program[program_data_address];
             end
+
             // Data memory
             if (data_write_enable) begin
                 fpga_data[data_address] <= uio_in;
-            end else begin
+            end
+            else begin
                 fpga_q2 <= fpga_data[data_address];
             end
+
         end
     end
 
     assign program_data_out = fpga_q1;
     assign data_out = fpga_q2;
 
+
 `elsif __pnr__
-    // LibreLane defines __pnr__ and supplies the black-box header through
-    // the MACROS configuration. VPWR/VGND are internal PDN nets, not user pins.
+
+    // ------------------------------------------------------------------------
+    // ASIC / LibreLane implementation
+    // ------------------------------------------------------------------------
+
     wire VPWR;
     wire VGND;
 
     // ------------------------------------------------------------------------
-    // HOLD-TIMING FIX
+    // SRAM timing-delay buffers
     //
-    // Add combinational delay between the address/write-enable registers
-    // and the SRAM inputs to resolve the post-route hold violations.
+    // These are COMBINATIONAL buffers.
     //
-    // GF180 standard cells have explicit power/body pins:
-    //   VDD -> VPWR
-    //   VSS -> VGND
-    //   VNW -> VPWR
-    //   VPW -> VGND
+    // Do NOT use:
+    //
+    //     always @(negedge clk)
+    //
+    // because that would add flip-flops and change the behavior of the
+    // design.
+    //
+    // GF180 standard cells use:
+    //
+    //     VDD = power
+    //     VSS = ground
+    //     VNW = n-well
+    //     VPW = p-well
+    //
     // ------------------------------------------------------------------------
 
     wire [6:0] sram_program_address;
     wire       sram_data_write_enable;
 
-    assign sram_program_address = program_data_address;
-    assign sram_data_write_enable = data_write_enable;
+    // Program SRAM address delay
+    //
+    // One buffer is instantiated for each bit of the 7-bit address bus.
+    //
+    genvar i;
+
+    generate
+        for (i = 0; i < 7; i = i + 1) begin : program_address_buffers
+
+            gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_address (
+                .I   (program_data_address[i]),
+                .Z   (sram_program_address[i]),
+                .VDD (VPWR),
+                .VSS (VGND),
+                .VNW (VPWR),
+                .VPW (VGND)
+            );
+
+        end
+    endgenerate
+
+
+    // Data SRAM write-enable delay
+
+    gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_data_write_enable (
+        .I   (data_write_enable),
+        .Z   (sram_data_write_enable),
+        .VDD (VPWR),
+        .VSS (VGND),
+        .VNW (VPWR),
+        .VPW (VGND)
+    );
+
 
     // ------------------------------------------------------------------------
     // Program SRAM
@@ -224,6 +272,7 @@ module tt_um_cpu (
         .Q    (program_data_out)
     );
 
+
     // ------------------------------------------------------------------------
     // Data SRAM
     // ------------------------------------------------------------------------
@@ -240,10 +289,13 @@ module tt_um_cpu (
         .Q    (data_out)
     );
 
+
 `else
-    // RTL simulation uses the official Google/GlobalFoundries timing model.
-    // Its power pins are tied off here; the functional model does not model
-    // power sequencing. The ASIC flow uses the physical macro branch above.
+
+    // ------------------------------------------------------------------------
+    // RTL simulation
+    // ------------------------------------------------------------------------
+
     wire model_vdd = 1'b1;
     wire model_vss = 1'b0;
 
@@ -273,7 +325,9 @@ module tt_um_cpu (
 
 `endif
 
-    // ui_in[7] is used for memory select (0=program, 1=data)
+    // ui_in[7] is used for memory select
+    // 0 = program
+    // 1 = data
 
 endmodule
 
