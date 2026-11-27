@@ -48,7 +48,7 @@
       "instances": {
         "sram1": {
           "location": [
-            160,
+            140,
             35
           ],
           "orientation": "N"
@@ -79,10 +79,10 @@
       "instances": {
         "sram2": {
           "location": [
-            140,
+            600,
             350
           ],
-          "orientation": "N"
+          "orientation": "W"
         }
       }
     }
