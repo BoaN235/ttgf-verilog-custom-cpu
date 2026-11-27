@@ -211,8 +211,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[0]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_1 (
@@ -220,8 +219,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[1]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_2 (
@@ -229,8 +227,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[2]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_3 (
@@ -238,8 +235,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[3]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_4 (
@@ -247,8 +243,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[4]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_5 (
@@ -256,8 +251,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[5]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     gf180mcu_fd_sc_mcu7t5v0__buf_4 delay_program_addr_6 (
@@ -265,8 +259,7 @@ module tt_um_cpu (
         .Z   (sram_program_address[6]),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     // Data SRAM write-enable delay buffer.
@@ -275,8 +268,7 @@ module tt_um_cpu (
         .Z   (sram_data_write_enable),
         .VDD (VPWR),
         .VSS (VGND),
-        .VNW (VPWR),
-        .VPW (VGND)
+        .VNW (VPWR)
     );
 
     // ------------------------------------------------------------------------
