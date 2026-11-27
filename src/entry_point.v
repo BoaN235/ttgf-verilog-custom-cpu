@@ -41,8 +41,6 @@ module tt_um_cpu (
     wire data_write_enable;
     wire [5:0] data_address;
 
-    wire [3:0] executing_cmd;
-
     wire unused = &{1'b0, ui_in[6:0]};
 
     // Output multiplexer: select which SRAM based on ui_in[7]
@@ -51,7 +49,7 @@ module tt_um_cpu (
     wire [6:0] cmd_address;
 
     reg [23:0] command_mem;
-    reg [23:0] value_mem;
+    reg [23:0] value_mem = 24'd0;
 
     wire jump_bool;
     wire [7:0] result;
@@ -87,6 +85,8 @@ module tt_um_cpu (
         .command_done(command_done)
 
     );
+
+    wire unused = &{1'b0, command_done};
 
     program_block programs (
 
