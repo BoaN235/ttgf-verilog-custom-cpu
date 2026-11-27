@@ -49,7 +49,7 @@
         "sram1": {
           "location": [
             250,
-            150
+            125
           ],
           "orientation": "S"
         }
