@@ -45,6 +45,8 @@
   "FP_PDN_VPITCH": 38.87,
 
   "RUN_CTS": 1,
+  "CTS_BALANCE_LEVELS": true,
+  "CTS_OBSTRUCTION_AWARE": true,
 
   "FP_PDN_MULTILAYER": 0,
 
