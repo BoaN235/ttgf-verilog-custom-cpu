@@ -231,14 +231,13 @@ module tt_um_cpu (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
-        .CEN  (sram_program_cen),
-        .GWEN (sram_program_gwen),
+        .CEN  (~ena),
+        .GWEN (~program_write_enable),
         .WEN  (8'h00),
-        .A    (sram_program_address),
-        .D    (sram_data),
+        .A    (program_data_address),
+        .D    (uio_in),
         .Q    (program_data_out)
     );
-
     // ------------------------------------------------------------------------
     // Data SRAM
     // ------------------------------------------------------------------------
@@ -247,11 +246,11 @@ module tt_um_cpu (
         .VDD  (VPWR),
         .VSS  (VGND),
         .CLK  (clk),
-        .CEN  (sram_data_cen),
-        .GWEN (sram_data_gwen),
+        .CEN  (~ena),
+        .GWEN (~data_write_enable),
         .WEN  (8'h00),
-        .A    (sram_data_address),
-        .D    (sram_data),
+        .A    (data_address),
+        .D    (uio_in),
         .Q    (data_out)
     );
 
